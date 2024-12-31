@@ -1,4 +1,5 @@
-#Algoritma solin
+import heapq
+
 class Graph:
     def __init__(self):
         self.graph = {}
@@ -9,33 +10,35 @@ class Graph:
         if v not in self.graph:
             self.graph[v] = []
         self.graph[u].append((v, weight))
-        self.graph[v].append((u, weight))  # For undirected graph
+        self.graph[v].append((u, weight))  # Untuk graf tidak terarah
 
     def solin_algorithm(self, start, end):
-        # Initialize distances and predecessors
+        # Inisialisasi jarak dan pendahulu
         distances = {node: float('inf') for node in self.graph}
         distances[start] = 0
         predecessors = {node: None for node in self.graph}
         
-        # Set of unvisited nodes
-        unvisited = set(self.graph.keys())
+        # Priority queue untuk menyimpan (jarak, node)
+        priority_queue = [(0, start)]
 
-        while unvisited:
-            # Get the node with the smallest distance
-            current_node = min(unvisited, key=lambda node: distances[node])
-            unvisited.remove(current_node)
+        while priority_queue:
+            current_distance, current_node = heapq.heappop(priority_queue)
 
-            # If we reached the end node
+            # Jika sudah mencapai node akhir
             if current_node == end:
                 break
 
-            # Update distances for neighbors
+            # Jika jarak saat ini lebih besar dari jarak yang diketahui
+            if current_distance > distances[current_node]:
+                continue
+
+            # Perbarui jarak untuk tetangga
             for neighbor, weight in self.graph[current_node]:
-                if neighbor in unvisited:
-                    new_distance = distances[current_node] + weight
-                    if new_distance < distances[neighbor]:
-                        distances[neighbor] = new_distance
-                        predecessors[neighbor] = current_node
+                new_distance = current_distance + weight
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    predecessors[neighbor] = current_node
+                    heapq.heappush(priority_queue, (new_distance, neighbor))
 
         return distances[end], predecessors
 
@@ -53,22 +56,24 @@ class Graph:
 def main():
     g = Graph()
     
-    # Add edges based on your provided data
+    # Menambahkan sisi berdasarkan data yang diberikan
     g.add_edge('A', 'B', 75)
     g.add_edge('B', 'C', 80)
-    g.add_edge('C', 'D', 130)
+    g.add_edge('C', 'D', 60)   
     g.add_edge('B', 'E', 90)
     g.add_edge('E', 'F', 80)
     g.add_edge('F', 'G', 120)
     g.add_edge('G', 'H', 80)
     g.add_edge('G', 'M', 100)
-    g.add_edge('M', 'N', 150)
-    g.add_edge('C', 'I', 130)
+    g.add_edge('M', 'N', 110)
+    g.add_edge('C', 'I', 120)
     g.add_edge('I', 'J', 120)
-    g.add_edge('J', 'K', 140)
-    g.add_edge('I', 'L', 125)
-    g.add_edge('L', 'O', 110)
+    g.add_edge('J', 'K', 100)
+    g.add_edge('I', 'L', 130)
+    g.add_edge('L', 'O', 115)
     g.add_edge('O', 'P', 130)
+    g.add_edge('D', 'J', 80)
+
 
     start_node = 'A'
     end_node = 'P'
